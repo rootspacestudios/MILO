@@ -147,6 +147,9 @@ $('#im').onclick=()=>$('#fi').click();
 $('#fi').onchange=async e=>{try{const j=JSON.parse(await e.target.files[0].text());if(!j.topics||!j.dues)throw 0;db=j;db.nid=db.nid||1e6;save();render();say('Backup restored.')}catch(x){say('That file is not a MILO backup.')}};
 $('#wipe').onclick=()=>{if(confirm('Erase all topics and dues on this device?')){db={topics:[],dues:[],nid:1};save();render()}};
 
+const V='0.2.85',CDNS=['https://cdn.jsdelivr.net/npm/@mlc-ai/web-llm@'+V+'/lib/index.js','https://esm.run/@mlc-ai/web-llm@'+V,'https://unpkg.com/@mlc-ai/web-llm@'+V+'/lib/index.js','https://esm.sh/@mlc-ai/web-llm@'+V];
+async function loadLib(){let err;for(const u of CDNS){try{const m=await import(u);if(m.CreateMLCEngine)return m}catch(e){err=e}}
+ throw new Error('could not download the AI library from any source ('+String(err&&err.message||err).slice(0,50)+'). Check your connection, or disable ad blockers and VPNs for this site')}
 let engine=null,busy=false;
 const MODE_OFF='Notes mode · <a href="#" id="aiq" style="color:#93c5fd">Turn on MILO AI</a> to ask study doubts (optional, free, no key)';
 function setMode(x){$('#mode').innerHTML=x;const q=$('#aiq');if(q)q.onclick=e=>{e.preventDefault();$('#ai').click()}}
@@ -155,7 +158,7 @@ $('#ai').onclick=async()=>{if(busy||engine)return;
  const st=t=>{$('#ais').textContent=t;setMode('MILO AI · '+esc(t)+(!busy&&!engine?' · <a href="#" id="aiq" style="color:#93c5fd">Try again</a>':''))};
  if(!navigator.gpu){st('this browser has no WebGPU, so MILO AI is unavailable here. Notes mode still works.');return}
  busy=true;
- try{st('loading the model (first time is a large download)...');const{CreateMLCEngine}=await import('https://esm.run/@mlc-ai/web-llm');
+ try{st('loading the AI library, then the model (first time is a large download)...');const{CreateMLCEngine}=await loadLib();
   engine=await CreateMLCEngine('Llama-3.2-1B-Instruct-q4f16_1-MLC',{initProgressCallback:r=>st(r.text)});
   busy=false;st('ready. Ask a question in the chat box.');$('#in').placeholder='Ask a doubt, or log notes and dues...'}
  catch(e){busy=false;engine=null;st('could not load the model ('+String(e.message||e).slice(0,80)+'). Notes mode still works.')}};
