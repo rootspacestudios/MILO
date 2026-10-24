@@ -32,14 +32,8 @@ summary{cursor:pointer;font-weight:700}details>div{margin-top:12px;display:grid;
 .q{margin:6px 0}.q input{margin-left:6px;width:160px}.good{color:#4ade80}.bad{color:#f87171}
 @media(max-width:760px){.grid{grid-template-columns:1fr}.slate{height:420px}}
 </style></head><body><div class="wrap">
-<h1 class="logo" aria-label="MILO"><svg width="180" height="60" viewBox="0 0 240 75" style="user-select:none;display:block" aria-hidden="true">
-<text x="10" y="58" fill="#ffffff" font-family="Georgia,serif" font-size="58" font-weight="700" letter-spacing="3">MIL</text>
-<text x="142" y="58" fill="#ffffff" font-family="Georgia,serif" font-size="58" font-weight="700">O</text>
-<ellipse cx="172" cy="38" rx="36" ry="11" fill="none" stroke="#ffffff" stroke-width="1.2" transform="rotate(-22 172 38)"/>
-<ellipse cx="172" cy="38" rx="36" ry="8" fill="none" stroke="#ffffff" stroke-width="0.9" transform="rotate(-15 172 38)"/>
-<text x="132" y="52" fill="#ffffff" font-size="12">✦</text>
-<text x="202" y="32" fill="#ffffff" font-size="12">✦</text></svg></h1>
-<div style="text-align:center;margin-bottom:10px"><button id="inst" hidden>📲 Install MILO as an app</button></div>
+<h1 class="logo"><img src="milo-logo.png" alt="MILO" style="height:64px;width:auto;display:block;user-select:none"></h1>
+<div style="text-align:center;margin-bottom:10px"><button id="inst">📲 Install MILO as an app</button></div>
 <div class="chat"><input id="in" placeholder="Try: Maths: eigenvalues intro   or   Physics: lab report due next friday"><button id="go">Add</button></div>
 <div id="reply" class="reply" hidden></div>
 
@@ -160,8 +154,11 @@ $('#ai').onclick=async()=>{const s=$('#ais');
   s.textContent='MILO AI is ready. Ask a question in the chat box.'}
  catch(e){engine=null;s.textContent='Could not load the model ('+String(e.message||e).slice(0,80)+'). Notes mode still works.'}};
 async function ask(q){say('Thinking...');try{const r=await engine.chat.completions.create({messages:[{role:'system',content:'You are MILO, a friendly study helper. Explain clearly with one short example, under 150 words.'},{role:'user',content:q}]});say(r.choices[0].message.content)}catch(e){say('The AI hit an error. Try again.')}}
-let dp;addEventListener('beforeinstallprompt',e=>{e.preventDefault();dp=e;$('#inst').hidden=false});
-$('#inst').onclick=async()=>{if(dp){dp.prompt();await dp.userChoice;dp=null;$('#inst').hidden=true}};
+let dp;addEventListener('beforeinstallprompt',e=>{e.preventDefault();dp=e});
+if(matchMedia('(display-mode: standalone)').matches||navigator.standalone)$('#inst').hidden=true;
+$('#inst').onclick=async()=>{if(dp){dp.prompt();await dp.userChoice;dp=null;return}
+ const ios=/iphone|ipad|ipod/i.test(navigator.userAgent);
+ say(ios?'On iPhone: open this page in Safari, tap the Share button, then Add to Home Screen.':'Open the browser menu (the three dots) and choose Install app or Add to Home screen. If you do not see it, use Chrome or Edge and avoid private windows.')};
 addEventListener('appinstalled',()=>{$('#inst').hidden=true});
 if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
 render();
