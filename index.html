@@ -2,6 +2,9 @@
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>MILO</title>
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#0b0f17">
+<link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="MILO">
 <style>
 *{box-sizing:border-box}body{margin:0;background:#0b0f17;color:#f1f5f9;font:15px system-ui,sans-serif}
 .wrap{max-width:1150px;margin:0 auto;padding:22px 16px 60px}
@@ -36,6 +39,7 @@ summary{cursor:pointer;font-weight:700}details>div{margin-top:12px;display:grid;
 <ellipse cx="172" cy="38" rx="36" ry="8" fill="none" stroke="#ffffff" stroke-width="0.9" transform="rotate(-15 172 38)"/>
 <text x="132" y="52" fill="#ffffff" font-size="12">✦</text>
 <text x="202" y="32" fill="#ffffff" font-size="12">✦</text></svg></h1>
+<div style="text-align:center;margin-bottom:10px"><button id="inst" hidden>📲 Install MILO as an app</button></div>
 <div class="chat"><input id="in" placeholder="Try: Maths: eigenvalues intro   or   Physics: lab report due next friday"><button id="go">Add</button></div>
 <div id="reply" class="reply" hidden></div>
 
@@ -63,7 +67,7 @@ summary{cursor:pointer;font-weight:700}details>div{margin-top:12px;display:grid;
  <div class="muted">Downloads a small open model that runs inside your browser, so it needs no key and no server. Large first download, needs a browser with WebGPU, and is slower and less capable than cloud AI. Without it MILO still organises notes and dues.</div>
  <div class="bar"><button id="ai">Enable MILO AI</button><span id="ais" class="muted"></span></div>
 </div></details>
-<p class="muted" style="text-align:center;margin-top:24px">Your data stays on this device. Use Backup to move it.</p>
+<p class="muted" style="text-align:center;margin-top:24px">Your data stays on this device. Use Backup to move it.<br>Install: Chrome and Edge show an install button above. On iPhone, tap Share, then Add to Home Screen.</p>
 </div>
 <script>
 const $=s=>document.querySelector(s),esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -156,5 +160,9 @@ $('#ai').onclick=async()=>{const s=$('#ais');
   s.textContent='MILO AI is ready. Ask a question in the chat box.'}
  catch(e){engine=null;s.textContent='Could not load the model ('+String(e.message||e).slice(0,80)+'). Notes mode still works.'}};
 async function ask(q){say('Thinking...');try{const r=await engine.chat.completions.create({messages:[{role:'system',content:'You are MILO, a friendly study helper. Explain clearly with one short example, under 150 words.'},{role:'user',content:q}]});say(r.choices[0].message.content)}catch(e){say('The AI hit an error. Try again.')}}
+let dp;addEventListener('beforeinstallprompt',e=>{e.preventDefault();dp=e;$('#inst').hidden=false});
+$('#inst').onclick=async()=>{if(dp){dp.prompt();await dp.userChoice;dp=null;$('#inst').hidden=true}};
+addEventListener('appinstalled',()=>{$('#inst').hidden=true});
+if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
 render();
 </script></body></html>
