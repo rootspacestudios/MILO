@@ -2,8 +2,7 @@
 
 A zero-friction study tracker built by a student, for students.
 
-**Live app:** https://rootspacestudios.github.io/milo/
-
+**Live app:** https://rootspacestudios.github.io/MILO/
 ## What it does
 - Type `Maths: eigenvalues intro` to log a topic
 - Type `Physics: lab report due next friday` to add a deadline
